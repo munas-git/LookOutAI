@@ -3,13 +3,19 @@
 # Project Title: LookOutAI
 
 ## Project Description.   
-LookOutAI is a tool literally for "looking out" lol. It takes an image of someone and looks for that person in another image or video clip, describes the person's outfit and potentially what the person is doing. You can also censor a target face or have only a target face uncensored, this is useful for security purposes where vido clips have to be processed with speed and high accuracy in order to provided as evidence by police or security departmentor without disclosure of the faces of other non individuals. You can also (for fun) replace a targets face with an emoji (🤪, 😈, 🤡, 🙄) or have only a targets face uncensored.... For example, getting rid of your ex's face in any image with other friends lol.   
+**LookOutAI** is a cutting-edge tool designed for "looking out"—both literally and figuratively. It uses advanced image recognition technology to identify a person in a photo or video clip by matching their image. Once identified, the system can provide a detailed description of the individual, including their actions or behavior.   
+
+LookOutAI also offers versatile features like selectively censoring a target or uncensoring only the target's face, ensuring privacy or clarity where needed.   
+
+This tool is especially valuable for security applications, where video footage must be processed quickly and with high precision. It enables law enforcement or security teams to prepare evidence while protecting the privacy of uninvolved individuals by blurring their faces.   
 
 ### Tools and Libraries used:
 * PIL
-* Streamlit
-* YoloV...
-* 
+* Docker
+* Gradio
+* Difflib
+* Pixtral AI
+* face_recognition
 
 ## Snapshots of System.
 ...

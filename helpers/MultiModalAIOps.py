@@ -80,4 +80,3 @@ def pixtral_describe_target(image_url:str):
 
 
 # OpenAI
-

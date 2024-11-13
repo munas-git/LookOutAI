@@ -149,14 +149,3 @@ def draw_bb(image_path: str, face_locations: list):
         cv2.rectangle(rgb_image, (left, top), (right, bottom), bb_color, 2)
 
     return rgb_image
-
-
-# dets = face_detector("../GroupIMG.jpeg")
-# embds = dets.get("face_embeddings")
-# face_locs = dets.get("face_locations")
-
-# print(target_candidates_compare(embds[2], embds, True, 0.8))
-
-
-def emoji_replacment():
-    pass

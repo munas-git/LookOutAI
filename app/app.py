@@ -61,7 +61,7 @@ def blur_others_actions(target_img, candidate_img, threshold):
         # bluring every other face except target face
         blured_image = blur_regions(candidate_img, other_faces_loc_array, 1.0)
 
-        threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {best_match_score * 100}%"
+        threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {100 * best_match_score:.2f}%"
         return target_bb_img, blured_image, threshold_details
     
     except Exception:
