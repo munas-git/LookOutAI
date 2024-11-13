@@ -10,75 +10,94 @@ from helpers.MultiModalAIOps import *
 
 # all button operations pre-processing
 def blur_target_actions(target_img, candidate_img, threshold):
-    # extracting faces info
-    target_img_details = face_detector(target_img)
-    candidate_img_details = face_detector(candidate_img)
-
-    # creating bounding box around detected target face
-    target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+    try:
     
-    # checking for most similar face.
-    best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), True, threshold)
-    best_match_score = best_match_details.get("best_sim_score")
-    target_match_loc = candidate_img_details.get("face_locations")[best_match_details.get("best_sim_score_index")]
+        # extracting faces info
+        target_img_details = face_detector(target_img)
+        candidate_img_details = face_detector(candidate_img)
 
-    # bluring target face
-    target_match_loc_array = [target_match_loc] # converting location tuple to list.... might handle this in function later
-    blured_image = blur_regions(candidate_img, target_match_loc_array, 1.0)
+        # creating bounding box around detected target face
+        target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+        
+        # checking for most similar face.
+        best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), True, threshold)
+        best_match_score = best_match_details.get("best_sim_score")
+        target_match_loc = candidate_img_details.get("face_locations")[best_match_details.get("best_sim_score_index")]
 
-    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {100 * best_match_score:.2f}%"
-    return target_bb_img, blured_image, threshold_details
+        # bluring target face
+        target_match_loc_array = [target_match_loc] # converting location tuple to list.... might handle this in function later
+        blured_image = blur_regions(candidate_img, target_match_loc_array, 1.0)
+
+        threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {100 * best_match_score:.2f}%"
+        return target_bb_img, blured_image, threshold_details
+    
+    except Exception:
+        message = f"""ERROR!!!: A 'single' target face has not been found at threshold value {threshold}. Kindly ensure you have uploaded a "target" image with only one indiidual and a clear "candidate image" as well.\
+            \n\nIf you have already done so, try reducing the "Minimum Similarity Threshold" """
+        return target_bb_img, candidate_img, message
 
 
 def blur_others_actions(target_img, candidate_img, threshold):
-    # extracting faces info
-    target_img_details = face_detector(target_img)
-    candidate_img_details = face_detector(candidate_img)
+    try:
+        # extracting faces info
+        target_img_details = face_detector(target_img)
+        candidate_img_details = face_detector(candidate_img)
 
-    # creating bounding box around detected target face
-    target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+        # creating bounding box around detected target face
+        target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
 
-    # checking for most similar face.
-    best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), False, threshold)
-    best_match_score = best_match_details.get("best_sim_score")
-    all_similarity_scores = np.array(best_match_details.get("sim_scores"))
+        # checking for most similar face.
+        best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), False, threshold)
+        best_match_score = best_match_details.get("best_sim_score")
+        all_similarity_scores = np.array(best_match_details.get("sim_scores"))
 
-    # removing most similar face index
-    indices = np.arange(all_similarity_scores.shape[0])
-    other_faces_indices = indices[indices != best_match_details.get("best_sim_score_index")]
+        # removing most similar face index
+        indices = np.arange(all_similarity_scores.shape[0])
+        other_faces_indices = indices[indices != best_match_details.get("best_sim_score_index")]
 
-    # every other face's location
-    other_faces_loc_array = np.array(candidate_img_details.get("face_locations"))[other_faces_indices]
+        # every other face's location
+        other_faces_loc_array = np.array(candidate_img_details.get("face_locations"))[other_faces_indices]
+        
+        # bluring every other face except target face
+        blured_image = blur_regions(candidate_img, other_faces_loc_array, 1.0)
+
+        threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {best_match_score * 100}%"
+        return target_bb_img, blured_image, threshold_details
     
-    # bluring every other face except target face
-    blured_image = blur_regions(candidate_img, other_faces_loc_array, 1.0)
-
-    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {best_match_score * 100}%"
-    return target_bb_img, blured_image, threshold_details
+    except Exception:
+        message = f"""ERROR!!!: A 'single' target face has not been found at threshold value {threshold}. Kindly ensure you have uploaded a "target" image with only one indiidual and a clear "candidate image" as well.\
+            \n\nIf you have already done so, try reducing the "Minimum Similarity Threshold" """
+        return target_bb_img, candidate_img, message
 
 
 def describe_target_actions(target_img, candidate_img, threshold):
-    # extracting faces info
-    target_img_details = face_detector(target_img)
-    candidate_img_details = face_detector(candidate_img)
+    try:
+        # extracting faces info
+        target_img_details = face_detector(target_img)
+        candidate_img_details = face_detector(candidate_img)
 
-    # creating bounding box around detected target face
-    target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+        # creating bounding box around detected target face
+        target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+        
+        # checking for most similar face.
+        best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), True, threshold)
+        best_match_score = best_match_details.get("best_sim_score")
+        target_match_loc = candidate_img_details.get("face_locations")[best_match_details.get("best_sim_score_index")]
+
+        # drawing bounding box on identical face
+        candidate_image_bb = draw_bb(candidate_img, [target_match_loc])
+
+        # Making Pixtral inference
+        image_url = image_to_data_url(candidate_image_bb)
+        description = pixtral_describe_target(image_url)
+
+        threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {100 * best_match_score:.2f}%\n\n{description}"
+        return target_bb_img, candidate_image_bb, threshold_details
     
-    # checking for most similar face.
-    best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), True, threshold)
-    best_match_score = best_match_details.get("best_sim_score")
-    target_match_loc = candidate_img_details.get("face_locations")[best_match_details.get("best_sim_score_index")]
-
-    # drawing bounding box on identical face
-    candidate_image_bb = draw_bb(candidate_img, [target_match_loc])
-
-    # Making Pixtral inference
-    image_url = image_to_data_url(candidate_image_bb)
-    description = pixtral_describe_target(image_url)
-
-    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {100 * best_match_score:.2f}%\n\n{description}"
-    return target_bb_img, candidate_image_bb, threshold_details
+    except Exception:
+        message = f"""ERROR!!!: A 'single' target face has not been found at threshold value {threshold}. Kindly ensure you have uploaded a "target" image with only one indiidual and a clear "candidate image" as well. \
+            \n\nIf you have already done so, try reducing the "Minimum Similarity Threshold".. If issue still persists then your API key is no longer valid."""
+        return target_bb_img, candidate_img, message
 
 
 # UI
@@ -97,9 +116,9 @@ with gr.Blocks() as demo:
 
     with gr.Row():
         with gr.Column(scale = 3): 
-            target_img = gr.Image(label = "Target Image", type = "filepath", height = 300, width = 500)
+            target_img = gr.Image(label = "Target Image (single face)", type = "filepath", height = 300, width = 500)
         with gr.Column(scale = 3):
-            candidate_img = gr.Image(label = "Candidate Image", type = "filepath", height = 300, width = 500)
+            candidate_img = gr.Image(label = "Candidate Image (multiple faces)", type = "filepath", height = 300, width = 500)
         with gr.Column(scale = 1, min_width = 200):
             threshold = gr.Slider(
                 label = "Minimum Similarity Threshold",

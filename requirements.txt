@@ -7,7 +7,7 @@ click==8.1.7
 colorama==0.4.6
 contourpy==1.3.0
 cycler==0.12.1
-dlib @ file:///D:/Education/RHUL-COURSE%20WORK/Thesis%20Project/Automated%20Attendance%20and%20Attention%20Tracker/system-env/Lib/site-packages/dlib-19.22.99-cp39-cp39-win_amd64.whl
+# dlib (from wheel... handled by setup.sh)
 eval_type_backport==0.2.0
 exceptiongroup==1.2.2
 face-recognition==1.3.0
