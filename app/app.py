@@ -1,19 +1,77 @@
+# handling import path issues.
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import gradio as gr
-from helpers import *
+from helpers.FaceOps import *
 
 
+# all button operations pre-processing
+def blur_target_actions(target_img, candidate_img, threshold):
+    # extracting faces info
+    target_img_details = face_detector(target_img)
+    candidate_img_details = face_detector(candidate_img)
+
+    # creating bounding box around detected target face
+    target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+    
+    # checking for most similar face.
+    best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), True, threshold)
+    best_match_score = best_match_details.get("best_sim_score")
+    target_match_loc = candidate_img_details.get("face_locations")[best_match_details.get("best_sim_score_index")]
+
+    # bluring target face
+    target_match_loc_array = [target_match_loc] # converting location tuple to list.... might handle this in function later
+    blured_image = blur_regions(candidate_img, target_match_loc_array, 1.0)
+
+    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {best_match_score * 100}%"
+    return target_bb_img, blured_image, threshold_details
+
+
+def blur_others_actions(target_img, candidate_img, threshold):
+    # extracting faces info
+    target_img_details = face_detector(target_img)
+    candidate_img_details = face_detector(candidate_img)
+
+    # creating bounding box around detected target face
+    target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+
+    # checking for most similar face.
+    best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), False, threshold)
+    best_match_score = best_match_details.get("best_sim_score")
+    all_similarity_scores = np.array(best_match_details.get("sim_scores"))
+
+    # removing most similar face index
+    indices = np.arange(all_similarity_scores.shape[0])
+    other_faces_indices = indices[indices != best_match_details.get("best_sim_score_index")]
+
+    # every other face's location
+    other_faces_loc_array = np.array(candidate_img_details.get("face_locations"))[other_faces_indices]
+    
+    # bluring every other face except target face
+    blured_image = blur_regions(candidate_img, other_faces_loc_array, 1.0)
+
+    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {best_match_score * 100}%"
+    return target_bb_img, blured_image, threshold_details
+
+
+def describe_target_actions(target_img, candidate_img, threshold):
+    pass
+
+
+# UI
 with gr.Blocks() as demo:
     gr.Markdown("# 'LookOutAI': Find a target face in another image and choose to blur it, blur all other faces, or describe the target face in the second image")
 
-
     with gr.Row():
-        with gr.Column(scale=3): 
-            image1 = gr.Image(label = "Target Image", type = "filepath", height = 300, width = 500)
-        with gr.Column(scale=3):
-            image2 = gr.Image(label = "Candidate Image", type = "filepath", height = 300, width = 500)
+        with gr.Column(scale = 3): 
+            target_img = gr.Image(label = "Target Image", type = "filepath", height = 300, width = 500)
+        with gr.Column(scale = 3):
+            candidate_img = gr.Image(label = "Candidate Image", type = "filepath", height = 300, width = 500)
         with gr.Column(scale = 1, min_width = 200):
             threshold = gr.Slider(
-                label = "Similarity Threshold",
+                label = "Minimum Similarity Threshold",
                 minimum = 0.55,
                 maximum = 1,
                 value = 0.55,
@@ -29,27 +87,27 @@ with gr.Blocks() as demo:
                 
 
     with gr.Row():
-        output1 = gr.Image(label = "Preview Target Image", height = 300, width = 500)
-        output2 = gr.Image(label = "Preview Candidate Image", height = 300, width = 500)
-        threshold_display = gr.Textbox(label = "Selected Threshold")
+        target_bb_img = gr.Image(label = "Preview Target Image", height = 300, width = 500)
+        Output_image = gr.Image(label = "Preview Candidate Image", height = 300, width = 500)
+        text_output = gr.Textbox(label = "Text Output")
 
 
     blur_target.click(
-        pass,
-        inputs = [image1, image2, threshold],
-        outputs = [output1, output2, threshold_display]
+        blur_target_actions,
+        inputs = [target_img, candidate_img, threshold],
+        outputs = [target_bb_img, Output_image, text_output]
     )
 
     blur_others.click(
-        pass,
-        inputs = [image1, image2, threshold],
-        outputs = [output1, output2, threshold_display]
+        blur_others_actions,
+        inputs = [target_img, candidate_img, threshold],
+        outputs = [target_bb_img, Output_image, text_output]
     )
 
     describe_target.click(
-        pass,
-        inputs = [image1, image2, threshold],
-        outputs = [output1, output2, threshold_display]
+        describe_target_actions,
+        inputs = [target_img, candidate_img, threshold],
+        outputs = [target_bb_img, Output_image, text_output]
     )
 
 
