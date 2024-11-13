@@ -23,7 +23,7 @@ def face_detector(image_path:str):
     ### Input   
     - **image_path == str:** String representing image path.
 
-    ### Outputs   
+    ### Output   
     - **face_details == dict:** dictioary containing arrays of information about each face accisible using `get` face_num, location, embedding.
     """
 
@@ -54,19 +54,19 @@ def face_detector(image_path:str):
     return face_details
     
 
-def target_candidates_compare(target_embedding:np.ndarray, candidate_embeddings:list, return_best_match = False, confidence: float = None):
+def target_candidates_compare(target_embedding:np.ndarray, candidate_embeddings:list, return_best_match = False, confidence: float = None) -> dict:
     """
     target_candidates_compare calculates the similarity between face embeddings given a single target embedding `target_embedding` and a list of embeddings `candidate_embeddings` to be compared against the `target_embedding`.
     The function then returns the embeddings as well as their respective similarity scores.   
 
-    ### Input   
+    ### Inputs   
     - **target_embedding == list:** List containing the embedding of the target face or face of interest.
     - **candidate_embeddings == list:** List containing possible matching embeddings for comparison with target embedding.
     - **return_best_match == bool** Boolean value used to determine if only the *best* (most similar) matching score and array index should be returned. This must be above a certain confidence threshold.
     - **confidence == float** float threshold value between ***0.55 and 1*** which ***must*** be set if return_best_match is set to `True`
 
     ### Outputs   
-    - **face_details == array:** 
+    - **face_details == dict:** 
     """
 
     # input validity check
@@ -93,26 +93,30 @@ def target_candidates_compare(target_embedding:np.ndarray, candidate_embeddings:
     else:
         return {
             "sim_scores" : similarity_scores_arr,
+            "best_sim_score" : similarity_scores_arr.max(),
             "best_sim_score_index" : similarity_scores_arr.argmax()
         }
 
 
-def blur_regions(image: np.ndarray, face_locations: list, alpha: float):
+def blur_regions(image_path: str, face_locations: list, alpha: float):
     """
     blur_regions blurs specified regions in an image with a configurable blur intensity (alpha).
 
-    ### Args:   
-        - **image** == np.ndarray: The input image (e.g., RGB or BGR).
+    ### Inputs:   
+        - **image_path** == str: The input image array filepath.
         - **face_locations** == list: List of bounding box coordinates [(top, right, bottom, left), ... (top, right, bottom, left)].
         - **alpha** == float: Blur intensity,  0 < blur, 1 <= full blur.
 
-    ### Returns:
+    ### Outputs:
         np.ndarray: Image with the specified region(s) blurred based on alpha.
     """
     if not (0 <= alpha <= 1):
         raise ValueError("Alpha must be value between 0 and 1.")
     
-    blended_image = image.copy() # copying image to avoid modifying original.... might change later
+    image = cv2.imread(image_path)
+    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    blended_image = rgb_image.copy() # copying image to avoid modifying original.... might change later
     
     for (top, right, bottom, left) in face_locations:
 
@@ -123,6 +127,28 @@ def blur_regions(image: np.ndarray, face_locations: list, alpha: float):
         blended_image[top:bottom, left:right] = blended_roi # region replacement
     
     return blended_image
+
+
+def draw_bb(image_path: str, face_locations: list):
+    """
+    draw_bb returns a version of the input image with a bounding box drawn over the detected face regions.
+
+    ### Inputs:   
+        - **image_path** == str: The input image file path.
+        - **face_locations** == list: List of bounding box coordinates [(top, right, bottom, left), ... (top, right, bottom, left)].
+
+    ### Outputs:
+        np.ndarray: Image with the specified region(s) blurred based on alpha.
+    """
+    
+    bgr_image_arr = cv2.imread(image_path)
+    rgb_image = cv2.cvtColor(bgr_image_arr, cv2.COLOR_BGR2RGB)
+    bb_color = (0, 255, 0)
+
+    for (top, right, bottom, left) in face_locations:
+        cv2.rectangle(rgb_image, (left, top), (right, bottom), bb_color, 2)
+
+    return rgb_image
 
 
 # dets = face_detector("../GroupIMG.jpeg")
