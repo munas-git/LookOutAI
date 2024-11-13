@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import gradio as gr
 from helpers.FaceOps import *
+from helpers.MultiModalAIOps import *
 
 
 # all button operations pre-processing
@@ -25,7 +26,7 @@ def blur_target_actions(target_img, candidate_img, threshold):
     target_match_loc_array = [target_match_loc] # converting location tuple to list.... might handle this in function later
     blured_image = blur_regions(candidate_img, target_match_loc_array, 1.0)
 
-    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {best_match_score * 100}%"
+    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {100 * best_match_score:.2f}%"
     return target_bb_img, blured_image, threshold_details
 
 
@@ -57,12 +58,42 @@ def blur_others_actions(target_img, candidate_img, threshold):
 
 
 def describe_target_actions(target_img, candidate_img, threshold):
-    pass
+    # extracting faces info
+    target_img_details = face_detector(target_img)
+    candidate_img_details = face_detector(candidate_img)
+
+    # creating bounding box around detected target face
+    target_bb_img = draw_bb(target_img, target_img_details.get("face_locations"))
+    
+    # checking for most similar face.
+    best_match_details = target_candidates_compare(target_img_details.get("face_embeddings"), candidate_img_details.get("face_embeddings"), True, threshold)
+    best_match_score = best_match_details.get("best_sim_score")
+    target_match_loc = candidate_img_details.get("face_locations")[best_match_details.get("best_sim_score_index")]
+
+    # drawing bounding box on identical face
+    candidate_image_bb = draw_bb(candidate_img, [target_match_loc])
+
+    # Making Pixtral inference
+    image_url = image_to_data_url(candidate_image_bb)
+    description = pixtral_describe_target(image_url)
+
+    threshold_details = f"Selected Threshold: {threshold}\nFace Similarity Score: {100 * best_match_score:.2f}%\n\n{description}"
+    return target_bb_img, candidate_image_bb, threshold_details
 
 
 # UI
+title = """
+# **LookOutAI**👀  
+#### *Find a target face in another image and choose to:*
+- **Blur it**
+- **Blur all other faces**
+- **Describe the target face**
+
+> **Minimum Similarity Threshold:** Use the slider to adjust detection sensitivity and watch ***LookOutAI*** look out for your target...
+"""
+
 with gr.Blocks() as demo:
-    gr.Markdown("# 'LookOutAI': Find a target face in another image and choose to blur it, blur all other faces, or describe the target face in the second image")
+    gr.Markdown(title)
 
     with gr.Row():
         with gr.Column(scale = 3): 
