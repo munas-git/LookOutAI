@@ -2,7 +2,6 @@
 
 # Project Title: LookOutAI
 
-## Project Description.   
 **LookOutAI** is a cutting-edge tool designed for "looking out"; both literally and figuratively. It uses advanced image recognition technology to identify a person in a photo or video clip by matching their image. Once identified, the system can provide a detailed description of the individual, including their actions or behavior.   
 
 LookOutAI also offers versatile features, such as selectively censoring a target or uncensoring only the target's face, ensuring privacy or clarity where needed.   
@@ -11,9 +10,10 @@ This tool is especially valuable for security applications, where video footage 
 
 ### Tools and Libraries used:
 * PIL
-* Docker
-* Gradio
+* cv2
 * Difflib
+* Gradio
+* Docker
 * Pixtral AI
 * face_recognition
 
