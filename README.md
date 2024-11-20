@@ -1,4 +1,4 @@
-#### Project Status: Incomplete.
+#### Project Status: Semi-complete.
 
 # Project Title: LookOutAI
 
@@ -17,8 +17,5 @@ This tool is especially valuable for security applications, where video footage 
 * Pixtral AI
 * face_recognition
 
-## Snapshots of System.
+## Snapshots of the System... ([Click for demo video](https://www.youtube.com/watch?v=0Q683n8gmIc)).
 ![Screenshot (479)](https://github.com/user-attachments/assets/49fab016-f4b5-4e56-a023-851e401bd5b9)
-
-## Demo of System.
-...
