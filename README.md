@@ -1,4 +1,4 @@
-#### Project Status: Semi-complete.
+#### Project Status: Complete.
 
 # Project Title: LookOutAI
 
@@ -37,3 +37,7 @@ The `Initially` commands above will clone the repo, navigate to the right path, 
 
 ## Snapshots of the System... ([Click for demo video](https://www.youtube.com/watch?v=0Q683n8gmIc)).
 ![Screenshot (479)](https://github.com/user-attachments/assets/49fab016-f4b5-4e56-a023-851e401bd5b9)
+
+> **Footnote**: I’ve decided not to implement the video processing feature as I’m now shifting my focus to developing my **AI/MLOps** skills. Along the way, I discovered **Azure Cognitive Services** and its impressive ability to handle such tasks effortlessly. This has inspired me to dive deeper into **cloud computing** and explore how to leverage its full potential.
+>   
+> It’s all about working smarter, not harder... though I promise, that doesn’t mean I’m lazy! It’s simply about advancing alongside technology and making the most of what’s available.
