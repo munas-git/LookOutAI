@@ -27,7 +27,7 @@ source setup.sh
 
 Subsequently
 ```
-source LookOutAIenv
+source LookOutAIenv/Scripts/activate
 python app/app.py
 ```
 
